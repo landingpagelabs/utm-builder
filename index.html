@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UTM Builder — Free Campaign URL Generator</title>
+  <meta name="description" content="Build UTM-tagged campaign URLs in seconds. Save presets, generate in bulk, decode existing URLs. Free, fast, no signup.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://utmbuilder.dev/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="UTM Builder — Free Campaign URL Generator">
+  <meta property="og:description" content="Build UTM-tagged campaign URLs in seconds. Save presets, generate in bulk, decode existing URLs.">
+  <meta property="og:url" content="https://utmbuilder.dev/">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="UTM Builder — Free Campaign URL Generator">
+  <meta name="twitter:description" content="Build UTM-tagged campaign URLs in seconds. Save presets, generate in bulk, decode existing URLs.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "UTM Builder",
+    "url": "https://utmbuilder.dev/",
+    "description": "Build UTM-tagged campaign URLs in seconds. Save presets, generate in bulk, decode existing URLs.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <h1>UTM Builder</h1>
+      <p>Build, save, and manage campaign URLs.</p>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="panel-builder" role="tab">Builder</button>
+      <button class="tab" data-tab="panel-bulk" role="tab"><span class="tab-full">Bulk Generator</span><span class="tab-short">Bulk</span></button>
+      <button class="tab" data-tab="panel-decoder" role="tab">URL Decoder</button>
+    </nav>
+
+    <!-- ═══════════ BUILDER TAB ═══════════ -->
+    <section id="panel-builder" class="tab-panel active" role="tabpanel">
+
+      <!-- Presets -->
+      <div class="preset-bar">
+        <div class="preset-select-wrapper">
+          <select id="preset-select" aria-label="Select a preset">
+            <option value="">Select a preset...</option>
+          </select>
+        </div>
+        <button class="btn" id="manage-presets-btn">Manage</button>
+      </div>
+
+      <!-- URL -->
+      <div class="form-group">
+        <label for="builder-url">Website URL <span class="required">*</span></label>
+        <input type="url" id="builder-url" placeholder="https://example.com/landing-page" autocomplete="off">
+      </div>
+
+      <!-- Source / Medium -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="builder-source">utm_source <span class="required">*</span></label>
+          <input type="text" id="builder-source" placeholder="google" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="builder-medium">utm_medium <span class="required">*</span></label>
+          <input type="text" id="builder-medium" placeholder="cpc" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Campaign -->
+      <div class="form-group">
+        <label for="builder-campaign">utm_campaign <span class="required">*</span></label>
+        <input type="text" id="builder-campaign" placeholder="spring_sale" autocomplete="off">
+      </div>
+
+      <!-- Term / Content -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="builder-term">utm_term <span class="optional">optional</span></label>
+          <input type="text" id="builder-term" placeholder="running+shoes" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="builder-content">utm_content <span class="optional">optional</span></label>
+          <input type="text" id="builder-content" placeholder="header_cta" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button class="btn" id="save-preset-btn">Save as Preset</button>
+        <button class="btn" id="clear-btn">Clear All</button>
+        <div class="lowercase-toggle">
+          <label>
+            <span class="toggle-switch">
+              <input type="checkbox" id="lowercase-toggle" checked>
+              <span class="toggle-slider"></span>
+            </span>
+            Auto-lowercase
+          </label>
+        </div>
+      </div>
+
+      <!-- Save Preset Form -->
+      <div id="save-preset-form" class="save-preset-form">
+        <div class="form-group">
+          <label for="preset-name">Preset Name</label>
+          <input type="text" id="preset-name" placeholder="e.g. Google Ads — Brand">
+        </div>
+        <div class="save-preset-actions">
+          <button class="btn btn-accent" id="confirm-save-preset">Save</button>
+          <button class="btn" id="cancel-save-preset">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Generated URL -->
+      <div class="generated-url-section">
+        <div class="generated-url-label">Generated URL</div>
+        <div id="generated-url-display" class="generated-url-display">
+          <span class="empty-state">Fill in the fields above to generate your URL</span>
+        </div>
+        <div class="generated-url-actions">
+          <button class="btn btn-accent" id="copy-url-btn">
+            <span class="icon-copy">Copy URL</span>
+            <span class="icon-check">Copied</span>
+          </button>
+          <span class="shortcut-hint"><kbd>&#8984;</kbd><kbd>K</kbd></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ BULK TAB ═══════════ -->
+    <section id="panel-bulk" class="tab-panel" role="tabpanel">
+
+      <div class="form-group">
+        <label for="bulk-urls">Landing Page URLs <span class="required">*</span></label>
+        <textarea id="bulk-urls" placeholder="https://example.com/page-1&#10;https://example.com/page-2&#10;https://example.com/page-3" rows="5"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="bulk-source">utm_source <span class="required">*</span></label>
+          <input type="text" id="bulk-source" placeholder="google" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="bulk-medium">utm_medium <span class="required">*</span></label>
+          <input type="text" id="bulk-medium" placeholder="cpc" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="bulk-campaign">utm_campaign <span class="required">*</span></label>
+        <input type="text" id="bulk-campaign" placeholder="spring_sale" autocomplete="off">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="bulk-term">utm_term <span class="optional">optional</span></label>
+          <input type="text" id="bulk-term" placeholder="running+shoes" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="bulk-content">utm_content <span class="optional">optional</span></label>
+          <input type="text" id="bulk-content" placeholder="header_cta" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-accent" id="bulk-generate-btn">Generate URLs</button>
+        <button class="btn" id="bulk-clear-btn">Clear All</button>
+      </div>
+
+      <div id="bulk-output" class="bulk-output" style="display:none;">
+        <div class="form-group">
+          <label>Generated URLs</label>
+          <textarea id="bulk-output-area" readonly rows="6"></textarea>
+        </div>
+        <div class="bulk-output-actions">
+          <button class="btn btn-accent" id="bulk-copy-btn">
+            <span class="icon-copy">Copy All</span>
+            <span class="icon-check">Copied</span>
+          </button>
+          <button class="btn" id="bulk-csv-btn">Export CSV</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ DECODER TAB ═══════════ -->
+    <section id="panel-decoder" class="tab-panel" role="tabpanel">
+
+      <div class="form-group">
+        <label for="decoder-input">Paste a UTM-tagged URL</label>
+        <input type="text" id="decoder-input" placeholder="https://example.com?utm_source=google&utm_medium=cpc&utm_campaign=spring" autocomplete="off">
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-accent" id="decode-btn">Decode</button>
+        <button class="btn" id="decoder-clear-btn">Clear</button>
+      </div>
+
+      <div id="decoder-result" class="decoder-result" style="display:none;">
+        <div id="decoder-params" class="decoder-params"></div>
+        <div class="decoder-actions-bar">
+          <button class="btn" id="decoder-use-in-builder">Use in Builder</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SEO CONTENT ═══════════ -->
+    <section class="seo-section">
+      <h2>What are UTM parameters?</h2>
+      <p>
+        UTM parameters are tags you add to the end of a URL so analytics tools like Google Analytics can tell you exactly where your traffic came from. When someone clicks a UTM-tagged link, those parameters get sent to your analytics, showing which campaigns, channels, and ads are actually driving results.
+      </p>
+      <p>
+        Without UTM tags, a click from a Facebook ad and a click from an organic LinkedIn post both show up as generic referral traffic. With them, you see the full picture: source, medium, campaign name, and even which specific ad variation someone clicked.
+      </p>
+
+      <table class="param-table">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Purpose</th>
+            <th>Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>utm_source</td>
+            <td>Identifies the platform or site sending the traffic</td>
+            <td><code>google</code>, <code>facebook</code>, <code>newsletter</code></td>
+          </tr>
+          <tr>
+            <td>utm_medium</td>
+            <td>The marketing medium or channel type</td>
+            <td><code>cpc</code>, <code>email</code>, <code>social</code></td>
+          </tr>
+          <tr>
+            <td>utm_campaign</td>
+            <td>The specific campaign or promotion name</td>
+            <td><code>spring_sale</code>, <code>product_launch</code></td>
+          </tr>
+          <tr>
+            <td>utm_term</td>
+            <td>Paid search keyword (optional)</td>
+            <td><code>running+shoes</code>, <code>crm+software</code></td>
+          </tr>
+          <tr>
+            <td>utm_content</td>
+            <td>Differentiates ads or links pointing to the same URL (optional)</td>
+            <td><code>header_cta</code>, <code>sidebar_banner</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      Built by <a href="https://www.landingpagelabs.co" target="_blank" rel="noopener">Landing Page Labs</a>
+    </footer>
+  </div>
+
+  <!-- ═══════════ PRESET MODAL ═══════════ -->
+  <div id="preset-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Manage Presets</h3>
+        <button class="modal-close" id="modal-close-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <ul id="preset-list" class="preset-list"></ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" id="modal-done-btn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
