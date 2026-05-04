@@ -1,5 +1,21 @@
 /* UTM Builder — Dark Mode, Amber Accent */
 
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('fonts/inter.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('fonts/jetbrains-mono.woff2') format('woff2');
+}
+
 :root {
   --bg: #0a0a0b;
   --bg-raised: #111113;
@@ -9,7 +25,7 @@
   --border-focus: #3f3f46;
   --text: #fafafa;
   --text-muted: #a1a1aa;
-  --text-dim: #71717a;
+  --text-dim: #8a8a93;
   --accent: #f59e0b;
   --accent-hover: #d97706;
   --accent-dim: rgba(245, 158, 11, 0.12);
@@ -723,18 +739,6 @@ select {
 
 .footer a:hover {
   color: var(--text);
-}
-
-/* Validation */
-.validation-msg {
-  font-size: 12px;
-  color: var(--red);
-  margin-top: 4px;
-  display: none;
-}
-
-.validation-msg.visible {
-  display: block;
 }
 
 /* Responsive */

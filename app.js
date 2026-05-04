@@ -5,7 +5,6 @@
 
   // ── Storage Keys ──
   const STORAGE_KEY = 'utm_builder_presets';
-  const HISTORY_KEY = 'utm_builder_history';
 
   // ── Default Presets ──
   const DEFAULT_PRESETS = [
@@ -78,14 +77,23 @@
   const modalDoneBtn = $('#modal-done-btn');
 
   // ── Tab Switching ──
-  tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      const target = tab.dataset.tab;
-      tabs.forEach((t) => t.classList.remove('active'));
-      panels.forEach((p) => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(target).classList.add('active');
+  function activateTab(targetId) {
+    tabs.forEach((t) => {
+      const isActive = t.dataset.tab === targetId;
+      t.classList.toggle('active', isActive);
+      t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      t.setAttribute('tabindex', isActive ? '0' : '-1');
     });
+    panels.forEach((p) => {
+      const isActive = p.id === targetId;
+      p.classList.toggle('active', isActive);
+      if (isActive) p.removeAttribute('hidden');
+      else p.setAttribute('hidden', '');
+    });
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => activateTab(tab.dataset.tab));
   });
 
   // ── URL Builder Logic ──
@@ -243,9 +251,12 @@
   });
 
   function copyToClipboard(text, btn) {
+    if (!navigator.clipboard) return;
     navigator.clipboard.writeText(text).then(() => {
       btn.classList.add('copied');
       setTimeout(() => btn.classList.remove('copied'), 1500);
+    }).catch(() => {
+      // Permission denied or insecure context; silently no-op
     });
   }
 
@@ -262,21 +273,26 @@
 
   // ── Presets ──
   function loadPresets() {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        // fall through
-      }
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) return JSON.parse(stored);
+    } catch {
+      // localStorage unavailable or JSON malformed; fall through to defaults
     }
-    // First visit — seed defaults
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PRESETS));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_PRESETS));
+    } catch {
+      // storage full or blocked; in-memory copy is still fine
+    }
     return [...DEFAULT_PRESETS];
   }
 
   function savePresets() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
+    } catch {
+      // storage quota exceeded; presets stay in memory for this session
+    }
   }
 
   function renderPresetSelect() {
@@ -292,7 +308,7 @@
   presetSelect.addEventListener('change', () => {
     const idx = presetSelect.value;
     if (idx === '') return;
-    const preset = presets[parseInt(idx)];
+    const preset = presets[parseInt(idx, 10)];
     if (!preset) return;
     sourceField.value = preset.source || '';
     mediumField.value = preset.medium || '';
@@ -350,12 +366,16 @@
   function openModal() {
     renderModalList();
     modalOverlay.classList.add('active');
+    modalOverlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    modalCloseBtn.focus();
   }
 
   function closeModal() {
     modalOverlay.classList.remove('active');
+    modalOverlay.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    managePresetsBtn.focus();
   }
 
   function renderModalList() {
@@ -381,7 +401,7 @@
 
     modalList.querySelectorAll('[data-delete]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.delete);
+        const idx = parseInt(btn.dataset.delete, 10);
         presets.splice(idx, 1);
         savePresets();
         renderPresetSelect();
@@ -410,7 +430,7 @@
     });
 
     bulkOutputArea.value = results.join('\n');
-    bulkOutput.style.display = 'block';
+    bulkOutput.removeAttribute('hidden');
   });
 
   bulkCopyBtn.addEventListener('click', () => {
@@ -454,7 +474,7 @@
     bulkTerm.value = '';
     bulkContent.value = '';
     bulkOutputArea.value = '';
-    bulkOutput.style.display = 'none';
+    bulkOutput.setAttribute('hidden', '');
   });
 
   // ── URL Decoder ──
@@ -466,14 +486,14 @@
   function decodeUrl() {
     const raw = decoderInput.value.trim();
     if (!raw) {
-      decoderResult.style.display = 'none';
+      decoderResult.setAttribute('hidden', '');
       return;
     }
 
     const normalized = normalizeUrl(raw);
     if (!isValidUrl(normalized)) {
       decoderParams.innerHTML = '<div class="decoder-param"><span class="decoder-param-key">Error</span><span class="decoder-param-value">Not a valid URL</span></div>';
-      decoderResult.style.display = 'block';
+      decoderResult.removeAttribute('hidden');
       return;
     }
 
@@ -499,10 +519,10 @@
       });
 
       decoderParams.innerHTML = html;
-      decoderResult.style.display = 'block';
+      decoderResult.removeAttribute('hidden');
     } catch {
       decoderParams.innerHTML = '<div class="decoder-param"><span class="decoder-param-key">Error</span><span class="decoder-param-value">Could not parse URL</span></div>';
-      decoderResult.style.display = 'block';
+      decoderResult.removeAttribute('hidden');
     }
   }
 
